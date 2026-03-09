@@ -2,20 +2,17 @@ package com.backend.demo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.backend.demo.dto.BookDto;
 import com.backend.demo.model.Book;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/books")
 public class BookController {
-    List<Book> books = new ArrayList();
+    List<Book> books = new ArrayList<>();
 
     @GetMapping
     public List<Book> getBooks() {
@@ -32,4 +29,34 @@ public class BookController {
         books.add(entity);
         return books;
     }
+
+    @PutMapping("/{id}")
+    public void updateData(@PathVariable("id") Long id, BookDto bookDto){
+        try {
+            for (Book book : books) {
+                if (Objects.equals(book.getId(), id)) {
+                    book.setAuthor(bookDto.getAuthor());
+                    book.setTitle(bookDto.getTitle());
+                    book.setIsbn(bookDto.getIsbn());
+                    books.add(book);
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteDate(@PathVariable("id")Long id){
+        try {
+            for (Book book : books) {
+                if (Objects.equals(book.getId(), id)) {
+                    books.remove(book);
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
 }
