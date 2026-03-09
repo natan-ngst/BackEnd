@@ -31,32 +31,20 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public void updateData(@PathVariable("id") Long id, BookDto bookDto){
-        try {
-            for (Book book : books) {
-                if (Objects.equals(book.getId(), id)) {
-                    book.setAuthor(bookDto.getAuthor());
-                    book.setTitle(bookDto.getTitle());
-                    book.setIsbn(bookDto.getIsbn());
-                    books.add(book);
-                }
+    public List<Book> updateData(@PathVariable("id") Long id, @RequestBody BookDto bookDto){
+        for (Book book : books) {
+            if (Objects.equals(book.getId(), id)) {
+                book.setAuthor(bookDto.getAuthor());
+                book.setTitle(bookDto.getTitle());
+                book.setIsbn(bookDto.getIsbn());
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
         }
+        return books;
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDate(@PathVariable("id")Long id){
-        try {
-            for (Book book : books) {
-                if (Objects.equals(book.getId(), id)) {
-                    books.remove(book);
-                }
-            }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
+    public List<Book> deleteDate(@PathVariable("id") Long id){
+        books.removeIf(book -> Objects.equals(book.getId(), id));
+        return books;
     }
-
 }
