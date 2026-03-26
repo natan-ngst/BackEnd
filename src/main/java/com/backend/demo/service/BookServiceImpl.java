@@ -1,20 +1,27 @@
 package com.backend.demo.service;
 
 import com.backend.demo.dto.BookDto;
+import com.backend.demo.model.Author;
 import com.backend.demo.model.Book;
+import com.backend.demo.repository.AuthorRepository;
 import com.backend.demo.repository.BookRepository;
+import com.backend.demo.repository.UserRepository;
+
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import com.backend.demo.model.User;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService{
 
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -24,23 +31,43 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public Book createBook(BookDto bookDto) {
+
         Book book = new Book();
-        book.setIsbn(bookDto.getIsbn());
-        book.setAuthor(bookDto.getAuthor());
         book.setTitle(bookDto.getTitle());
+        book.setIsbn(bookDto.getIsbn());
+
+        // ambil author
+        Author author = authorRepository.findById(bookDto.getAuthorId())
+            .orElseThrow(() -> new RuntimeException("Author not found"));
+
+    book.setAuthor(author);
+
+        // ambil user list
+        List<User> users = userRepository.findAllById(bookDto.getUserIds());
+        book.setUsers(users);
+
         return bookRepository.save(book);
     }
 
     @Override
     public Book updateBook(Long id, BookDto bookDto) {
-        Optional<Book> book = bookRepository.findById(id);
-        if(book.isPresent()){
-            book.get().setTitle(bookDto.getTitle());
-            book.get().setIsbn(bookDto.getIsbn());
-            book.get().setAuthor(bookDto.getAuthor());
-            bookRepository.save(book.get());
-        }
-        return book.get();
+
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        book.setTitle(bookDto.getTitle());
+        book.setIsbn(bookDto.getIsbn());
+
+        // ambil author
+        Author author = authorRepository.findById(bookDto.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("Author not found"));
+        book.setAuthor(author);
+
+        // ambil user list
+        List<User> users = userRepository.findAllById(bookDto.getUserIds());
+        book.setUsers(users);
+
+        return bookRepository.save(book);
     }
 
     @Override

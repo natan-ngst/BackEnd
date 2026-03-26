@@ -1,22 +1,37 @@
 package com.backend.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.*;
+
+
+import java.util.List;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Book {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
-    private String author;
     private String isbn;
+
+    // MANY TO ONE (Book -> Author)
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    @JsonBackReference
+    private Author author;
+
+    // MANY TO MANY (Book <-> User)
+    @ManyToMany
+    @JoinTable(
+        name = "book_user",
+        joinColumns = @JoinColumn(name = "book_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
 }
